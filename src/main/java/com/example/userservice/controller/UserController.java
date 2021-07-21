@@ -1,9 +1,12 @@
 package com.example.userservice.controller;
 
 import com.example.userservice.vo.Greeting;
+import com.example.userservice.vo.RequestUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -27,5 +30,10 @@ public class UserController {
     @GetMapping("/welcome")
     public String welcome(){
         return env.getProperty("greeting.message") + greeting.getMessage();
+    }
+
+    @PostMapping("/users")
+    public String createUser(@RequestBody RequestUser user){
+        return "Create user method is called";
     }
 }
