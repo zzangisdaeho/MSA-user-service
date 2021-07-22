@@ -1,7 +1,7 @@
 server:
   port: 0 #0번은 randomport를 사용하겠다는 의미
-#  servlet:
-#    context-path: /user-service
+  servlet:
+    context-path: /user-service
 
 spring:
   jpa:
