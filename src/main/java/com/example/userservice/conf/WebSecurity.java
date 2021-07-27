@@ -26,14 +26,16 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
 
-//        http.authorizeRequests().antMatchers("/users/**").permitAll();
-        http.authorizeRequests().antMatchers("/**")
-                .hasIpAddress("192.168.1.14") //IP 변경
-                .and()
-                .addFilter(getAuthenticatonFilter());
+        http.authorizeRequests()
+                .antMatchers("/**")
+                .hasIpAddress("192.168.1.14"); //IP 변경
+
+        http.addFilter(getAuthenticatonFilter());
 
         //h2 console을 출력하기 위한 옵션
         http.headers().frameOptions().disable();
+
+//        http.formLogin();
     }
 
     private AuthenticationFilter getAuthenticatonFilter() throws Exception {

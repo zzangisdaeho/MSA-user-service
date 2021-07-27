@@ -85,4 +85,9 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.OK).body(result);
     }
+
+//    @GetMapping("/auth/hello")
+//    public ResponseEntity<String> hello(){
+//        return ResponseEntity.status(HttpStatus.OK).body("pass!!");
+//    }
 }
