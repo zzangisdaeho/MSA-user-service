@@ -1,12 +1,17 @@
 package com.example.userservice.service;
 
+import com.example.userservice.client.OrderServiceClient;
 import com.example.userservice.dto.UserDto;
 import com.example.userservice.entity.UserEntity;
+import com.example.userservice.error.FeignErrorDecoder;
 import com.example.userservice.repository.UserRepository;
 import com.example.userservice.vo.ResponseOrder;
+import feign.FeignException;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.env.Environment;
@@ -26,6 +31,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class UserServiceImpl implements UserService{
 
     private final UserRepository userRepository;
@@ -36,15 +42,19 @@ public class UserServiceImpl implements UserService{
 
     private final Environment env;
 
+    private final OrderServiceClient orderServiceClient;
+
     @Autowired
     @Qualifier("mapperStrict")
     private ModelMapper mapper;
 
-    public UserServiceImpl(UserRepository userRepository, @Lazy BCryptPasswordEncoder passwordEncoder, RestTemplate restTemplate, Environment env) {
+    public UserServiceImpl(UserRepository userRepository, @Lazy BCryptPasswordEncoder passwordEncoder,
+                           RestTemplate restTemplate, Environment env, OrderServiceClient orderServiceClient) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.restTemplate = restTemplate;
         this.env = env;
+        this.orderServiceClient = orderServiceClient;
     }
 
     @Transactional
@@ -71,13 +81,27 @@ public class UserServiceImpl implements UserService{
         UserDto userDto = mapper.map(findUser.get(), UserDto.class);
 
         //Using as rest template
-        String orderUrl = String.format(env.getProperty("order_service.url"), userId);
-        ResponseEntity<List<ResponseOrder>> orderListResponse =
-                restTemplate.exchange(orderUrl, HttpMethod.GET, null
-                , new ParameterizedTypeReference<List<ResponseOrder>>() {
-                });
+//        String orderUrl = String.format(env.getProperty("order_service.url"), userId);
+//        ResponseEntity<List<ResponseOrder>> orderListResponse =
+//                restTemplate.exchange(orderUrl, HttpMethod.GET, null
+//                , new ParameterizedTypeReference<List<ResponseOrder>>() {
+//                });
+//
+//        List<ResponseOrder> orderList = orderListResponse.getBody();
 
-        List<ResponseOrder> orderList = orderListResponse.getBody();
+        //Using a feign client
+        /* Feign exception handling*/
+//        List<ResponseOrder> orderList = null;
+//        try {
+//
+//            orderList = orderServiceClient.getOrders(userId);
+//        }catch (FeignException ex){
+//            log.error(ex.getMessage());
+//        }
+
+        /* Feign errorDecoder*/
+        List<ResponseOrder> orderList = orderServiceClient.getOrders(userId);
+
         userDto.setOrders(orderList);
 
         return userDto;

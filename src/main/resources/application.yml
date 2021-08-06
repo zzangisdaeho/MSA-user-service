@@ -44,6 +44,7 @@ logging:
   level:
     com.example.userservice: debug
 
+
 #token:
 #  expiration_time: 86400000 #1day milisecond
 #  secret: user_token
